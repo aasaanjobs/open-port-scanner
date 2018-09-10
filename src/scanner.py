@@ -52,6 +52,7 @@ def print_ip_metadata(ip_list):
 
 
 def send_report(file_contents):
+    # TODO :: Set the value for SENDGRID_API_KEY
     sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
 
     timestamp = time.time()
