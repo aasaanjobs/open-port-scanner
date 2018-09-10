@@ -58,8 +58,8 @@ def send_report(file_contents):
     time_now = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
     print("Time now: ", time_now)
 
-    from_email = Email("test@example.com")
-    to_email = Email("test@example.com")
+    from_email = Email("port.scanner@aasaanjobs.com")
+    to_email = Email("asad.khan@aasaanjobs.com")
     subject = "Open port scanner report - " + time_now
     mail_content = Content("text/plain", file_contents)
     mail_draft = Mail(from_email, subject, to_email, mail_content)
@@ -82,11 +82,9 @@ def get_output_content():
 
 if __name__ == "__main__":
     api_response = get_instance_ip_address_list()
-    debug = False
     scan_success = execute_port_scan(api_response)
     if scan_success:
         content = get_output_content()
-        if debug:
-            send_report(content)
+        send_report(content)
     else:
         print("Scanning Failed!")
