@@ -1,16 +1,28 @@
-# Python script to get IP address of all project vm instances
+#!/usr/bin/env python
+#  Python script to get IP address of all project vm instances
 
 import os
 
 import time
 import googleapiclient.discovery
 import sendgrid
+from jinja2 import Environment, FileSystemLoader
+import nmap  # import nmap.py module
 
 from datetime import datetime
 from sendgrid.helpers.mail import *
 
 project = "aj-cloud-staging"
 region = "asia-south1"
+
+scanner = nmap.PortScanner()  # instantiate nmap.PortScanner object
+
+# data = {
+#     "35.200.203.245": {
+#         "ports": ["tcp/22\tstate:open", "tcp/80\tstate:open"]
+#     }
+#
+# }
 
 
 def get_instance_ip_address_list():
@@ -24,22 +36,56 @@ def get_instance_ip_address_list():
 
 
 def execute_port_scan(api_result):
-    if api_result is not None:
-        ip_list = api_result['items']
+    data = {}
+    for instance in api_result['items']:
+        scanner.scan(instance['address'], '1-65535')
+        print(scanner.command_line())
+        for host in scanner.all_hosts():
+            data[host] = {}
+            print('-----------------------------------------------------------------')
+            print('Host : %s (%s)' % (host, scanner[host].hostname()))
 
-        print_ip_metadata(ip_list)
+            for proto in scanner[host].all_protocols():
+                print('--------------------')
+                print('Protocol : %s' % proto)
+                ports = scanner[host][proto]
 
-        for item in ip_list:
-            ip = item['address']
-            command = "nmap -sV -p- " + ip + " -Pn"
-            os.system('output="$(' + command + ')"; echo $output >> output.txt; echo "\n" >> output.txt')
+                data[host]['ports'] = []
+                for port in ports:
+                    state = scanner[host][proto][port]['state']
+                    port_data = '%s:%s\t state: %s' % (proto, port, state)
+                    print(port_data)
+                    data[host]['ports'].append(port_data)
+        print('----------------------------------------------------')
+        print("\n")
 
-        print("Completed scans of all IPs. Please find report in output.txt")
-        return True
-    else:
-        print("IP addresses couldn't be retrieved... Error occurred")
-        print(api_result)
-        return False
+    env = Environment(loader=FileSystemLoader('.'))
+    template = env.get_template("sample_format.html")
+    template_vars = {
+        "title": "Port Scanner",
+        "data": data
+    }
+    return template.render(template_vars)
+
+
+# def execute_port_scan(api_result):
+#     if api_result is not None:
+#         ip_list = api_result['items']
+#
+#         print_ip_metadata(ip_list)
+#
+#         for item in ip_list:
+#             ip = item['address']
+#             command = "nmap -sV -p 1-10 " + ip + " -Pn -oX output.xml"
+#             # os.system('output="$(' + command + ')"; echo $output >> output.txt; echo "\n" >> output.txt')
+#             os.system('output="$(' + command + ')"; ')
+#
+#         print("Completed scans of all IPs. Please find report in output.txt")
+#         return True
+#     else:
+#         print("IP addresses couldn't be retrieved... Error occurred")
+#         print(api_result)
+#         return False
 
 
 def print_ip_metadata(ip_list):
@@ -51,7 +97,7 @@ def print_ip_metadata(ip_list):
         print("Instance: " + name + "  -  IP Address: " + ip + "  -  ID: " + instance_id)
 
 
-def send_report(file_contents):
+def send_report(report_content):
     # TODO :: Set the value for SENDGRID_API_KEY
     sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
 
@@ -62,7 +108,7 @@ def send_report(file_contents):
     from_email = Email("port.scanner@aasaanjobs.com")
     to_email = Email("asad.khan@aasaanjobs.com")
     subject = "Open port scanner report - " + time_now
-    mail_content = Content("text/plain", file_contents)
+    mail_content = Content("text/plain", report_content)
     mail_draft = Mail(from_email, subject, to_email, mail_content)
     response = sg.client.mail.send.post(request_body=mail_draft.get())
 
@@ -70,22 +116,13 @@ def send_report(file_contents):
     print(response.body)
     print(response.headers)
 
-    # Clear file contents
-    os.system('echo "\n" > output.txt')
-
-
-def get_output_content():
-    with open("output.txt", "r") as output_file:
-        file_content = output_file.read()
-        print("File Content: ", file_content)
-        return file_content
-
 
 if __name__ == "__main__":
     api_response = get_instance_ip_address_list()
     scan_success = execute_port_scan(api_response)
-    if scan_success:
-        content = get_output_content()
-        send_report(content)
-    else:
-        print("Scanning Failed!")
+    print(scan_success)
+    # if scan_success:
+    #     content = get_output_content()
+    #     send_report(content)
+    # else:
+    #     print("Scanning Failed!")

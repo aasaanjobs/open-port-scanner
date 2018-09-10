@@ -2,9 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>{{ title }}</title>
 </head>
 <body>
-$END$
+
+<div>
+    <p>IP Addresses</p>
+    {% for ip in data %}
+    <p>{{ ip }}</p>
+    <ul>
+        {% for port_data in ip.ports %}
+        <li>{{ port_data }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+</div>
+
 </body>
 </html>
