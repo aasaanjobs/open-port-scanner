@@ -105,3 +105,4 @@ venv.bak/
 
 # intelliJ meta files
 .idea/
+src/output.txt
