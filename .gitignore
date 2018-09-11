@@ -107,3 +107,4 @@ venv.bak/
 .idea/
 src/output.txt
 *.DS_Store
+*/output.html
