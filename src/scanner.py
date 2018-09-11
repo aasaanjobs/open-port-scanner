@@ -84,7 +84,7 @@ def execute_port_scan(api_result):
 
 def render_output(data):
     env = Environment(loader=FileSystemLoader('.'))
-    template = env.get_template("sample_format.html")
+    template = env.get_template("output_template.html")
     template_vars = {
         "title": "Port Scanner results",
         "data": data
