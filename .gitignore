@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# intelliJ meta files
+.idea/
+src/output.txt
+*.DS_Store
+*/output.html

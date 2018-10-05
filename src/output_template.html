@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ title }}</title>
+    <link href="//cdn.muicss.com/mui-0.9.41/css/mui.min.css" rel="stylesheet" type="text/css"/>
+    <style>
+        td { background-color: #fafafa; }
+    </style>
+</head>
+
+<body>
+
+<div class="mui-container-fluid">
+    <h2>Open port scanner result</h2>
+    <hr>
+    {% for host_data in data %}
+    <div class="mui-container-fluid">
+        {% for ip_address, port_list in host_data.items() %}
+        <p>Host IP Address: {{ip_address}}</p>
+        <table id="{{ip_address}}" class="mui-table">
+            <tr class="mui-panel">
+                <th bgcolor="#bbb">PORT</th>
+                <th bgcolor="#bbb">STATUS</th>
+            </tr>
+            {% for row in port_list %}
+            {% for port_name, port_status in row.items() %}
+            <tr class="mui-panel">
+                <td>{{port_name}}</td>
+                <td>{{port_status}}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </table>
+        {% endfor %}
+        <br/>
+        <hr>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+<!--<script src="//cdn.muicss.com/mui-0.9.41/js/mui.min.js"></script>-->
+
+
+</html>
