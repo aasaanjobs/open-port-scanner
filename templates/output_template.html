@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ title }}</title>
+    <link href="//cdn.muicss.com/mui-0.9.41/css/mui.min.css" rel="stylesheet" type="text/css"/>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: center;
+            padding: 8px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="mui-container-fluid">
+    <h2>Port Scanner Report</h2>
+    <hr>
+    {% for datum in data %}
+    <div class="mui-container-fluid">
+        <table id="{{datum.instance.id}}">
+            <tr class="mui-panel">
+                <th style="background-color: #dddddd;">NAME</th>
+                <th style="background-color: #dddddd;">PROJECT</th>
+                <th style="background-color: #dddddd;">IP</th>
+            </tr>
+            <tr class="mui-panel">
+                <td>{{datum.instance.name}}</td>
+                <td>{{datum.instance.project}}</td>
+                <td>{{datum.instance.ip}}</td>
+            </tr>
+        </table>
+        <table id="{{ip_address}}" class="mui-table">
+            <tr class="mui-panel">
+                <th style="background-color: #dddddd;">PORT</th>
+                <th style="background-color: #dddddd;">STATUS</th>
+            </tr>
+            {% for row in datum.port_results %}
+                <tr class="mui-panel">
+                    <td>tcp:{{row.port}}</td>
+                    <td>{{row.status}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <br/>
+        <hr>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+<!--<script src="//cdn.muicss.com/mui-0.9.41/js/mui.min.js"></script>-->
+
+
+</html>

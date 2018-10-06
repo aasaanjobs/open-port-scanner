@@ -108,3 +108,4 @@ venv.bak/
 src/output.txt
 *.DS_Store
 */output.html
+.vscode/
